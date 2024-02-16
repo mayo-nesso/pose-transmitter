@@ -10,8 +10,9 @@ class VideoPose():
     def __init__(self, infer_method, input_size) -> None:
         self._infer = infer_method
         self.model_input_size = input_size
+        self.processing = False
 
-    def infer(self, source=0, process_pipleline=None, display_results=True):
+    def start_processing(self, source=0, process_pipleline=None, display_results=True):
         vcap = cv.VideoCapture(source)
 
         if not vcap.isOpened():
@@ -23,7 +24,8 @@ class VideoPose():
         image_height = vcap.get(cv.CAP_PROP_FRAME_HEIGHT)  # float `height`
         crop_region = th_utils.init_crop_region(image_height, image_width)
 
-        while True:
+        self.processing = True
+        while self.processing:
             # Read next frame from the video
             success, frame = vcap.read()
             if not success:
@@ -44,7 +46,7 @@ class VideoPose():
             # Send results through pipeline.... -->
             process_pipleline and process_pipleline(keypoint_locs, keypoint_edges, edge_colors)
             # Debug & Drawing edges and points!
-            display_results and self.display_pipe(frame, keypoint_locs, keypoint_edges, edge_colors)
+            display_results and self._display_pipe(frame, keypoint_locs, keypoint_edges, edge_colors)
 
             # #
             # Get new crop region!
@@ -55,7 +57,10 @@ class VideoPose():
         del(vcap)
         cv.destroyAllWindows()
 
-    def display_pipe(self, cv_frame, keypoint_locs, keypoint_edges, edge_colors):
+    def stop_processing(self):
+        self.processing = False
+
+    def _display_pipe(self, cv_frame, keypoint_locs, keypoint_edges, edge_colors):
         # #
         # Debug & Drawing edges and points!
         for i, lp in enumerate(tf.cast(keypoint_edges, dtype=tf.int32).numpy()):

@@ -10,6 +10,7 @@ class QUDPTransmitter:
         self.port = port
         self.mqueue = queue.Queue()
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.tranmitting = False
 
     def _send(self, msge):
         self.sock.sendto(msge, (self.ip, self.port))
@@ -19,10 +20,10 @@ class QUDPTransmitter:
         self.mqueue.put(msge_as_bytes)
 
     def activate_transmission(self):
-        while True:
+        self.tranmitting = True
+        while self.tranmitting:
             data = self.mqueue.get()
-
-            if data is None:
-                print("EOD: No more data!")
-                break
             self._send(data)
+
+    def stop_transmission(self):
+        self.tranmitting = False
