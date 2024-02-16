@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "poseestimation"
+version = "0.1.0"
+description = ""
+authors = ["Mayo Nesso <mayofunk@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+imageio = "^2.34.0"
+opencv-python = "^4.9.0.80"
+# https://github.com/python-poetry/poetry/issues/8271#issuecomment-1712020965
+tensorflow = {version = "^2.13.0" }
+tensorflow-macos = { version = "^2.13.0", platform = "darwin", markers = "platform_machine=='arm64'" }
+tensorflow-cpu = [
+    { version = "^2.13.0", platform = "linux", markers = "platform_machine!='arm64' and platform_machine!='aarch64'" },
+    { version = "^2.13.0", platform = "darwin", markers = "platform_machine!='arm64' and platform_machine!='aarch64'" },]
+tensorflow-io-gcs-filesystem = [
+    { version = ">= 0.23.1", markers = "platform_machine!='arm64' or platform_system!='Darwin'" },
+    { version = "< 0.32.0", markers = "platform_system == 'Windows'" }
+]
+
+tensorflow-metal = "^1.1.0"
+numpy = "^1.26.4"
+matplotlib = "^3.8.2"
+tensorflow-hub = "^0.16.1"
+tensorflow-docs = "^2023.5.24.56664"
+ipykernel = "^6.29.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
