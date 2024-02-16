@@ -27,7 +27,12 @@ def _get_file(file_name, url):
     print(f"Downloading {file_name}...")
     response = requests.get(url)
     if response.status_code == 200:
-        # Escribir el contenido de la respuesta en el archivo
+        destination_folder = os.path.dirname(file_name)
+        # Create folder if doesn't exists!
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder)
+
+        # Write contents on file!
         with open(file_name, "wb") as file:
             file.write(response.content)
     else:
@@ -47,7 +52,7 @@ def _get_infer_method(model_name):
         else:
             raise ValueError("Unsupported model name: %s" % model_name)
 
-        model_path = f"{model_name}.tflite"
+        model_path = os.path.join("cached_models", f"{model_name}.tflite")
         _get_file(model_path, url)
 
         # Initialize the TFLite interpreter
