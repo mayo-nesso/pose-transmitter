@@ -1,27 +1,14 @@
-import tensorflow_hub as hub
-
+import tf_hub_models as th_models
 from video_pose import VideoPose
 
-MODELS_MovenetLight = "movenet_lightning"
-MODELS_MovenetThunder = "movenet_thunder"
+MODELS_Movenet_Light = "movenet_lightning"
+MODELS_Movenet_Light_Litle_8 = "movenet_lightning_int8.tflite"
+MODELS_Movenet_Light_Litle_16 = "movenet_lightning_f16.tflite"
+MODELS_Movenet_Thunder = "movenet_thunder"
+MODELS_Movenet_Thunder_Litle_8 = "movenet_thunder_int8.tflite"
+MODELS_Movenet_Thunder_Litle_16 = "movenet_thunder_f16.tflite"
 
-
-def load_model(model_name):
-    # if model_name == "":
-    if "movenet_lightning" in model_name:
-        module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
-        input_size = 192
-    elif "movenet_thunder" in model_name:
-        module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
-        input_size = 256
-    else:
-        raise ValueError(f"Unsupported model name: {model_name}")
-
-    return module.signatures["serving_default"], input_size
-
-
-model, model_input_size = load_model(MODELS_MovenetLight)
-
-vp = VideoPose(model, model_input_size)
+infer_method, model_input_size = th_models.get_infer_and_input_size(MODELS_Movenet_Thunder_Litle_16)
+vp = VideoPose(infer_method, model_input_size)
 
 vp.infer()
