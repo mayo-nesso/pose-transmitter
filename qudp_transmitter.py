@@ -19,15 +19,13 @@ class QUDPTransmitter:
         self.DEBUG = debug
 
     def _send(self, msge):
+        self.sock.sendto(msge, (self.ip, self.port))
         if self.DEBUG:
             # FPS
             end_time = time()
             fps = 1 / (end_time - self.start_time)
-            print(f"net send fps: {fps:.1f}")
-
+            print(f"QUDPTransmitter: _send FPS: {fps:.1f}")
         self.start_time = end_time
-
-        self.sock.sendto(msge, (self.ip, self.port))
 
     def put_message(self, keypoint_locs, keypoint_edges, edge_colors):
         msge = {"locs": keypoint_locs.tolist(), "edges": keypoint_edges.tolist()}
