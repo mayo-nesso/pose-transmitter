@@ -272,4 +272,3 @@ def run_inference(movenet, image, crop_region, crop_size):
             crop_region["x_min"] * image_width + crop_region["width"] * image_width * keypoints_with_scores[0, 0, idx, 1]
         ) / image_width
     return keypoints_with_scores
-

@@ -12,12 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-
 import os
 
 import requests
 import tensorflow as tf
 import tensorflow_hub as hub
+
+
+class Models:
+    Movenet_Lightning = "movenet_lightning"
+    Movenet_Lightning_Litle_8 = "movenet_lightning_int8.tflite"
+    Movenet_Lightning_Litle_16 = "movenet_lightning_f16.tflite"
+    Movenet_Thunder = "movenet_thunder"
+    Movenet_Thunder_Litle_8 = "movenet_thunder_int8.tflite"
+    Movenet_Thunder_Litle_16 = "movenet_thunder_f16.tflite"
 
 
 def _get_file(file_name, url):
@@ -117,10 +125,8 @@ def _get_infer_method(model_name):
         return movenet
 
 
-def get_infer_and_input_size(model_name):
-    # Infer method...
-    infer_method = _get_infer_method(model_name)
+def _get_input_size(model_name):
     # Model input size...
     input_size = 192 if "lightning" in model_name else 256
 
-    return infer_method, input_size
+    return input_size
