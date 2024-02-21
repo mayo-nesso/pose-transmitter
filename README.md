@@ -23,9 +23,10 @@ The default value for the host is `127.0.0.1`, and for the port `4900`.
 
 ## UDP Message Structure
 
-The messages sent via UDP have the following structure:
+The messages are serialized with the library [msgpack](https://msgpack.org/index.html) and sent via UDP.</br>
+They have the following structure:
 
-```
+```lang-plaintext
     [
         [989.79443359375, 635.7391967773438], 
         [1091.6107177734375, 512.1315307617188], 
@@ -36,7 +37,10 @@ The messages sent via UDP have the following structure:
 ```
 
 Which is a list of positions of the points found by the inference model.
-It is worth noting that not all points could be inferred and sent to the list. For example, if the camera captures half a body, it will send the information of the points found on that half body.
+
+> 📝 __Note__:</br>
+> It is worth noting that not all points could be inferred and sent to the list.</br>
+> For example, if the camera captures half a body, it will send the information of the points found on that half body.
 
 The list of points follows the logic described in [TensorFlow Lite Pose Estimation Example](https://www.tensorflow.org/lite/examples/pose_estimation/overview), i.e.:
 
@@ -59,8 +63,6 @@ The list of points follows the logic described in [TensorFlow Lite Pose Estimati
 |14| rightKnee|
 |15| leftAnkle|
 |16| rightAnkle|
-
-For more information, refer to the TensorFlow Lite Pose Estimation documentation.
 
 ## Notes
 
