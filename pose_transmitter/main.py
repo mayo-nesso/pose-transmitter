@@ -17,7 +17,9 @@ def parse_arguments():
         "--infer_model",
         type=str,
         default="lightning",
-        help="Movenet Inference Model to use; (lightning, thunder, lightning_lite8, thunder_lite16...) ",
+        help="Movenet Inference Model to use; Options are: \
+                            lightning, lightning_lite8, lightning_lite16, \
+                            thunder, thunder_lite8, thunder_lite16",
     )
     return parser.parse_args()
 
@@ -45,17 +47,9 @@ def retrive_hub(infer_model):
             )
 
 
-def main():
-    args = parse_arguments()
-
+def initialize_and_run(infer_model, video_source, host_ip, host_port, debug):
     # Inference model hub
-    tensor_hub = retrive_hub(args.infer_model)
-
-    # Calling main function with arguments from command line
-    main_function(tensor_hub, args.source, args.host_ip, args.host_port, args.debug)
-
-
-def main_function(tensor_hub, video_source, host_ip, host_port, debug):
+    tensor_hub = retrive_hub(infer_model)
     # VideoPose estimator...
     vp = VideoPose(tensor_hub, source=video_source, debug=debug)
     # UDP Transmitter
@@ -77,4 +71,6 @@ def main_function(tensor_hub, video_source, host_ip, host_port, debug):
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_arguments()
+    # Calling main function with arguments from command line
+    initialize_and_run(args.infer_model, args.source, args.host_ip, args.host_port, args.debug)
