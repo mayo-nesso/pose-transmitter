@@ -18,7 +18,7 @@ class VideoPose():
             debug: Flag to enable debug mode.
         """
         self.thub = thub
-        self.source = source
+        self.source = 0 if source == "0" else source
         self._stop_event = threading.Event()
         self.DEBUG = debug
         self.start_time = time()
