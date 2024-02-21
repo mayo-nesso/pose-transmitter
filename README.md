@@ -64,7 +64,7 @@ For more information, refer to the TensorFlow Lite Pose Estimation documentation
 
 ## Notes
 
-- The performance can be improved. Since *It works on my machine ¯\_(ツ)_/¯* at a decent framerate, this is left as an exercise to the adventurers (which probably is me in the future).
+- The performance can be improved. Since *It works on my machine ¯\\_(ツ)_/¯ at a decent framerate, this is left as an exercise to the adventurers (which probably is me in the future).
 
 ## Author
 
