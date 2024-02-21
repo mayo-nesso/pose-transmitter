@@ -25,7 +25,7 @@ class QUDPTransmitter:
             end_time = time()
             fps = 1 / (end_time - self.start_time)
             print(f"QUDPTransmitter: _send FPS: {fps:.1f}")
-        self.start_time = end_time
+            self.start_time = end_time
 
     def put_message(self, keypoint_locs, keypoint_edges, edge_colors):
         msge = {"locs": keypoint_locs.tolist(), "edges": keypoint_edges.tolist()}

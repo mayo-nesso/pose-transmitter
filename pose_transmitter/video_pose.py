@@ -9,6 +9,14 @@ from matplotlib import colors
 class VideoPose():
 
     def __init__(self, thub, source=0, debug=False) -> None:
+        """
+        Initialize VideoPose object.
+
+        Args:
+            thub: Inference hub object.
+            source: Source for video input.
+            debug: Flag to enable debug mode.
+        """
         self.thub = thub
         self.source = source
         self._stop_event = threading.Event()
@@ -16,10 +24,14 @@ class VideoPose():
         self.start_time = time()
 
     def _start_processing_loop(self, callback=None, display_results=True):
+        """
+        Start processing loop.
+
+        Args:
+            callback: Callback function to send results.
+            display_results: Flag to display results.
+        """
         vcap = cv.VideoCapture(self.source)
-        # vcap.set(cv.CAP_PROP_FRAME_WIDTH, 640)
-        # vcap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
-        # vcap.set(cv.CAP_PROP_FPS, 30)
         if not vcap.isOpened():
             print("E: VideoCapture failed to start! aborting...")
             return None
@@ -29,7 +41,6 @@ class VideoPose():
         image_height = vcap.get(cv.CAP_PROP_FRAME_HEIGHT)
 
         while not self._stop_event.is_set():
-            # Read next frame from the video
             success, frame = vcap.read()
             if not success:
                 break
@@ -49,8 +60,10 @@ class VideoPose():
             # #
             # Send results through pipeline.... -->
             callback and callback(keypoint_locs, keypoint_edges, edge_colors)
+
             # Debug & Drawing edges and points!
-            display_results and self._display_pipe(frame, keypoint_locs, keypoint_edges, edge_colors)
+            if display_results:
+                self._display_pipe(frame, keypoint_locs, keypoint_edges, edge_colors)
 
         # Let it goooooo....
         vcap.release()
@@ -58,10 +71,17 @@ class VideoPose():
         cv.destroyAllWindows()
 
     def _display_pipe(self, cv_frame, keypoint_locs, keypoint_edges, edge_colors):
-        # #
-        # Debug & Drawing edges and points!
+        """
+        Display keypoints and edges on frame.
+
+        Args:
+            cv_frame: OpenCV frame.
+            keypoint_locs: Keypoint locations.
+            keypoint_edges: Keypoint edges.
+            edge_colors: Edge colors.
+        """
         for i, lp in enumerate(tf.cast(keypoint_edges, dtype=tf.int32).numpy()):
-            col = colors.to_rgb(edge_colors[i]) 
+            col = colors.to_rgb(edge_colors[i])
             col = tuple(c * 255 for c in col)
             cv.line(cv_frame, lp[0], lp[1], col, thickness=1)
         for p in tf.cast(keypoint_locs, dtype=tf.int32).numpy():
@@ -88,13 +108,19 @@ class VideoPose():
         cv.waitKey(F60)
 
     def stop_processing(self):
+        """Stop video processing."""
         self._stop_event.set()
 
     def start_processing(self, callback):
+        """
+        Start video processing.
+
+        Args:
+            callback: Callback function to send results.
+        """
         if self.DEBUG:
             self._start_processing_loop(callback=callback, display_results=True)
         else:
             video_thread = threading.Thread(target=self._start_processing_loop, args=(callback, False))
             video_thread.start()
-            #    # Esperar a que los threads terminen
             video_thread.join()
