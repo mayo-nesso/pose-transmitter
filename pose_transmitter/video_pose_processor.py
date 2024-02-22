@@ -6,21 +6,21 @@ import tensorflow as tf
 from matplotlib import colors
 
 
-class VideoPose():
+class VideoPoseProcessor:
 
-    def __init__(self, thub, source=0, debug=False) -> None:
+    def __init__(self, inference_hub, source=0, debug=False) -> None:
         """
         Initialize VideoPose object.
 
         Args:
-            thub: Inference hub object.
+            inference_hub: Inference hub object.
             source: Source for video input.
             debug: Flag to enable debug mode.
         """
-        self.thub = thub
+        self.inference_hub = inference_hub
         self.source = 0 if source == "0" else source
-        self._stop_event = threading.Event()
-        self.DEBUG = debug
+        self.stop_event = threading.Event()
+        self.debug = debug
         self.start_time = time()
 
     def _start_processing_loop(self, callback=None, display_results=True):
@@ -33,44 +33,40 @@ class VideoPose():
         """
         vcap = cv.VideoCapture(self.source)
         if not vcap.isOpened():
-            print("E: VideoCapture failed to start! aborting...")
-            return None
+            raise RuntimeError("VideoCapture failed to start!")
 
-        # Initial crop region
+        # Get video dimensions
         image_width = vcap.get(cv.CAP_PROP_FRAME_WIDTH)
         image_height = vcap.get(cv.CAP_PROP_FRAME_HEIGHT)
 
-        while not self._stop_event.is_set():
+        while not self.stop_event.is_set():
             success, frame = vcap.read()
             if not success:
                 break
 
-            # We need to convert from cv BRG to RGB
+            # We need to convert from OpenCV BRG to RGB encoding...
             image = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
 
-            # #
-            # Actual inference !
-            keypoints_with_scores = self.thub.run_inference(image, image_height, image_width)
+            # Run inference !
+            keypoints_with_scores = self.inference_hub.run_inference(image, image_height, image_width)
 
             # Get points, edges and colors from keypoints...:
-            (keypoint_locs, keypoint_edges, edge_colors) = self.thub.keypoints_and_edges_for_display(
+            (keypoint_locs, keypoint_edges, edge_colors) = self.inference_hub.keypoints_and_edges_for_display(
                 keypoints_with_scores, image_height, image_width
             )
 
-            # #
-            # Send results through pipeline.... -->
+            # Send results through the callback function
             callback and callback(keypoint_locs, keypoint_edges, edge_colors)
 
             # Debug & Drawing edges and points!
             if display_results:
-                self._display_pipe(frame, keypoint_locs, keypoint_edges, edge_colors)
+                self._display_frame(frame, keypoint_locs, keypoint_edges, edge_colors)
 
-        # Let it goooooo....
+        # Release resources
         vcap.release()
-        del(vcap)
         cv.destroyAllWindows()
 
-    def _display_pipe(self, cv_frame, keypoint_locs, keypoint_edges, edge_colors):
+    def _display_frame(self, cv_frame, keypoint_locs, keypoint_edges, edge_colors):
         """
         Display keypoints and edges on frame.
 
@@ -85,7 +81,9 @@ class VideoPose():
             col = tuple(c * 255 for c in col)
             cv.line(cv_frame, lp[0], lp[1], col, thickness=1)
         for p in tf.cast(keypoint_locs, dtype=tf.int32).numpy():
-            cv.drawMarker(cv_frame, p, (255,0,0), markerType=cv.MARKER_TRIANGLE_UP, markerSize=20, thickness=1, line_type=cv.LINE_AA)
+            cv.drawMarker(
+                cv_frame, p, (255, 0, 0), markerType=cv.MARKER_TRIANGLE_UP, markerSize=20, thickness=1, line_type=cv.LINE_AA
+            )
 
         # FPS
         end_time = time()
@@ -100,7 +98,7 @@ class VideoPose():
             color=(0, 200, 0),
             thickness=3,
         )
-        # #
+
         # Display image
         cv.imshow("Image", cv_frame)
         # wait time in millisecs...(desired...)
@@ -109,7 +107,7 @@ class VideoPose():
 
     def stop_processing(self):
         """Stop video processing."""
-        self._stop_event.set()
+        self.stop_event.set()
 
     def start_processing(self, callback):
         """
@@ -118,7 +116,7 @@ class VideoPose():
         Args:
             callback: Callback function to send results.
         """
-        if self.DEBUG:
+        if self.debug:
             self._start_processing_loop(callback=callback, display_results=True)
         else:
             video_thread = threading.Thread(target=self._start_processing_loop, args=(callback, False))

@@ -38,6 +38,17 @@ class Hub:
         self.crop_region = None
 
     def run_inference(self, image, image_height, image_width):
+        """
+        Run inference on the input image.
+
+        Args:
+            image (numpy.ndarray): Input image.
+            image_height (int): Height of the input image.
+            image_width (int): Width of the input image.
+
+        Returns:
+            numpy.ndarray: Keypoints with scores.
+        """
         if self.crop_region is None:
             self.crop_region = init_crop_region(image_height, image_width)
 
@@ -50,4 +61,15 @@ class Hub:
         return keypoints_with_scores
 
     def keypoints_and_edges_for_display(self, keypoints_with_scores, image_height, image_width):
+        """
+        Get keypoints and edges for display.
+
+        Args:
+            keypoints_with_scores (numpy.ndarray): Keypoints with scores.
+            image_height (int): Height of the input image.
+            image_width (int): Width of the input image.
+
+        Returns:
+            tuple: Tuple containing keypoints and edges.
+        """
         return keypoints_and_edges_for_display(keypoints_with_scores, image_height, image_width)

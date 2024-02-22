@@ -9,11 +9,11 @@ Finally, the information inferred by the TensorFlow model is transmitted via UDP
 
 You can run the code from the console using the following format:
 
-`python ./pose_transmitter/main.py --source 0 --host_ip 127.0.0.1 --host_port 4900 --debug`
+`python ./pose_transmitter/main.py --video_source 0 --host_ip 127.0.0.1 --host_port 4900 --debug`
 
 or:
 
-`python ./pose_transmitter/main.py --source some_video.mp4`
+`python ./pose_transmitter/main.py --video_source some_video.mp4`
 
 or simply:
 
