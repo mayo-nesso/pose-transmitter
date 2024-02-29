@@ -77,8 +77,8 @@ def run_processing(vpp, transmitter):
     exit_thread.start()
 
     # Start transmission and pose inference!
-    vpp.start_processing(callback=transmitter.put_message)
     transmitter.start_transmission()
+    vpp.start_processing(callback=transmitter.put_message)
 
 
 def main():
